@@ -1,8 +1,7 @@
 // The purpose of this file is to show how to use the cf parser properly
 #include "cfp.hpp"
 
-int main() 
-{
+int main() {
     CFParser parser; // Initialize parser object
     parser.read("file.cf"); // read the file (parse file content into a dictionary)
 
