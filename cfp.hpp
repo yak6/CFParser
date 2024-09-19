@@ -1,6 +1,5 @@
 #ifndef CFP_HPP
 #define CFP_HPP
-
 #include <string>
 #include <iostream>
 #include <map>
