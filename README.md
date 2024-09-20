@@ -1,12 +1,7 @@
 # CFParser
 CFParser is a config parser header for C++
 
-## How to use
-### Compiling 
-```bash
-g++ <filename>.cpp cfp.hpp 
-```
-### Usage
+## Usage
 #### Include header and initialize parser object:
 ```cpp
 #include "cfp.hpp"
