@@ -1,5 +1,6 @@
 #ifndef CFP_HPP
 #define CFP_HPP
+
 #include <string>
 #include <iostream>
 #include <map>
@@ -10,8 +11,9 @@
 
 class CFParser {
 private: 
-    char sectionChar = '.';
-    char defvarChar = ':';
+    const char sectionChar = '.';
+    const char defvarChar = ':';
+
     std::string FILENAME;
 
     std::string removeSectionChar(std::string &str) {
@@ -76,7 +78,12 @@ public:
         }
         file.close();
     }
-
+    void create(const std::map<std::string, std::map<std::string, std::string>>& map, const std::string& filename) { 
+        std::ofstream file(filename);
+        file.close();
+        FILENAME = filename; 
+        f_update(map);
+    }
     void e_update(const std::string& section, const std::string& valuename, const std::string& value) { 
         std::map<std::string, std::map<std::string, std::string>> tempDict;
         tempDict[section] = {{valuename, value}};
@@ -101,7 +108,9 @@ public:
             content.pop_back();
         }
 
-        content += '\n';
+        if (!content.empty()) {
+            content += '\n';
+        }
 
         for (const auto& Section : map) {
             std::size_t sectionPos = content.find(sectionChar + Section.first);
@@ -112,13 +121,11 @@ public:
                     content += Pair.first + defvarChar + Pair.second + "\n";
                 }
             } else {
-            
                 std::size_t nextSectionPos = content.find(sectionChar, sectionPos + 1); 
                 
                 for (const auto& Pair : Section.second) {
                     std::size_t varPos = content.find(Pair.first + defvarChar, sectionPos);
                     
-                 
                     if (varPos == std::string::npos || (nextSectionPos != std::string::npos && varPos > nextSectionPos)) {
                         if (nextSectionPos == std::string::npos) {
                             content += Pair.first + defvarChar + Pair.second + "\n";
@@ -141,6 +148,7 @@ public:
         outfile << content;
         outfile.close();
     }
+
 
     void update() {
         f_update(cf); 
