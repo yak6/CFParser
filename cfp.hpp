@@ -1,5 +1,5 @@
-#ifndef CFP_HPP
-#define CFP_HPP
+#ifndef PARSER_HPP
+#define PARSER_HPP
 
 #include <string>
 #include <iostream>
@@ -9,11 +9,10 @@
 #include <algorithm>
 #include <vector>
 
-class CFParser {
+class Parser {
 private: 
-    const char sectionChar = '.';
-    const char defvarChar = ':';
-
+    char sectionChar = '.';
+    char defvarChar = ':';
     std::string FILENAME;
 
     std::string removeSectionChar(std::string &str) {
@@ -49,7 +48,7 @@ private:
     }
 
 public:
-    std::map<std::string, std::map<std::string, std::string>> cf;
+    std::map<std::string, std::map<std::string, std::string>> dictionary;
 
     void read(const std::string& filename) {
         std::ifstream file(filename);
@@ -66,24 +65,19 @@ public:
         while (std::getline(file, line)) {
             if (!line.empty() && line[0] == sectionChar) {
                 currentSection = removeSectionChar(line);
-                cf[currentSection] = {}; 
+                dictionary[currentSection] = {}; 
                 continue;
             }
 
             std::vector<std::string> data = split(line, defvarChar);
             
             if (data.size() == 2) {
-                cf[currentSection][data[0]] = data[1];
+                dictionary[currentSection][data[0]] = data[1];
             }
         }
         file.close();
     }
-    void create(const std::map<std::string, std::map<std::string, std::string>>& map, const std::string& filename) { 
-        std::ofstream file(filename);
-        file.close();
-        FILENAME = filename; 
-        f_update(map);
-    }
+
     void e_update(const std::string& section, const std::string& valuename, const std::string& value) { 
         std::map<std::string, std::map<std::string, std::string>> tempDict;
         tempDict[section] = {{valuename, value}};
@@ -108,24 +102,24 @@ public:
             content.pop_back();
         }
 
-        if (!content.empty()) {
-            content += '\n';
-        }
+        content += '\n';
 
         for (const auto& Section : map) {
             std::size_t sectionPos = content.find(sectionChar + Section.first);
             if (sectionPos == std::string::npos) {
                 content += sectionChar + Section.first + "\n";
                 for (const auto& Pair : Section.second) {
-                    cf[Section.first][Pair.first] = Pair.second; 
+                    dictionary[Section.first][Pair.first] = Pair.second; 
                     content += Pair.first + defvarChar + Pair.second + "\n";
                 }
             } else {
+            
                 std::size_t nextSectionPos = content.find(sectionChar, sectionPos + 1); 
                 
                 for (const auto& Pair : Section.second) {
                     std::size_t varPos = content.find(Pair.first + defvarChar, sectionPos);
                     
+                 
                     if (varPos == std::string::npos || (nextSectionPos != std::string::npos && varPos > nextSectionPos)) {
                         if (nextSectionPos == std::string::npos) {
                             content += Pair.first + defvarChar + Pair.second + "\n";
@@ -149,10 +143,9 @@ public:
         outfile.close();
     }
 
-
     void update() {
-        f_update(cf); 
+        f_update(dictionary); 
     }
 };
 
-#endif // CFP_HPP
+#endif // PARSER_HPP
